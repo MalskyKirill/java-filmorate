@@ -20,7 +20,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(User user) {
+    public User createUser(@RequestBody User user) {
         validateUser(user);
         user.setId(getNextId());
 
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(User newUser) {
+    public User updateUser(@RequestBody User newUser) {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
@@ -51,7 +51,7 @@ public class UserController {
         if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().matches("\\s+")) {
             throw new ValidationException("логин не может быть пустым и содержать пробелы");
         }
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {

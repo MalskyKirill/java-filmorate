@@ -29,7 +29,8 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(Film newFilm) { // обновляем фильм
+    public Film updateFilm(@RequestBody Film newFilm) { // обновляем фильм
+        System.out.println(newFilm.toString());
         if (newFilm.getId() == null) { // проверка что фильм пришел с id
             throw new ValidationException("Id должен быть указан");
         }
