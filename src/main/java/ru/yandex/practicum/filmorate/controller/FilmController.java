@@ -51,7 +51,7 @@ public class FilmController {
         throw new ValidationException("Фильм с id = " + newFilm.getId() + " не найден");
     }
 
-    private void validationFilm (Film film) {
+    private void validationFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             log.error("error - название не может быть пустым");
             throw new ValidationException("название не может быть пустым");
@@ -64,7 +64,7 @@ public class FilmController {
             log.error("error - дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
         }
-        if (film.getDuration() == null || film.getDuration().isZero() || film.getDuration().isNegative()) {
+        if (film.getDuration() == null || film.getDuration() <= 0) {
             log.error("error - продолжительность фильма должна быть положительным числом");
             throw new ValidationException("продолжительность фильма должна быть положительным числом");
         }
