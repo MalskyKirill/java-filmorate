@@ -23,7 +23,7 @@ public class FilmControllerTest {
 
     @Test
     void createAndAddFilm() {
-        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1985, 05, 23), 1000);
+        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1995, 05, 23), 1000);
 
         filmController.createFilm(newFilm);
         Assertions.assertEquals(testFilm, newFilm);
