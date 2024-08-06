@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -25,12 +27,14 @@ public class UserController {
         user.setId(getNextId());
 
         users.put(user.getId(), user);
+        log.info("'{}' юзер был добавлен, его id '{}'", user.getName(), user.getId());
         return user;
     }
 
     @PutMapping
     public User updateUser(@RequestBody User newUser) {
         if (newUser.getId() == null) {
+            log.error("error - Id должен быть указан");
             throw new ValidationException("Id должен быть указан");
         }
 
@@ -38,9 +42,11 @@ public class UserController {
 
         if (users.containsKey(newUser.getId())) {
             users.put(newUser.getId(), newUser);
+            log.info("'{}' юзер с id '{}' был обновлен", newUser.getName(), newUser.getId());
             return newUser;
         }
 
+        log.error("error - Фильм с id = '{}' не найден", newUser.getId());
         throw new ValidationException("Юзер с id = " + newUser.getId() + " не найден");
     }
 
@@ -52,6 +58,7 @@ public class UserController {
             throw new ValidationException("логин не может быть пустым и содержать пробелы");
         }
         if (user.getName() == null || user.getName().isBlank()) {
+            log.info("юзеру установлено имя", user.getLogin());
             user.setName(user.getLogin());
         }
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
