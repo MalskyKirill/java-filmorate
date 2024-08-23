@@ -32,11 +32,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        if (newFilm.getId() == null) { // проверка что фильм пришел с id
-            log.error("error - Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
-        }
-
         if (films.containsKey(newFilm.getId())) { // если в мапе есть ключ айдишник
             films.put(newFilm.getId(), newFilm); // заменяем фильм на новый
             log.info("'{}' фильм с id '{}' был обновлен", newFilm.getName(), newFilm.getId());
