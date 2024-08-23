@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -13,7 +14,7 @@ import java.util.Collection;
 @Slf4j
 @AllArgsConstructor
 public class FilmServiceImpl implements FilmService {
-    private final FilmStorage filmStorage;
+    private final InMemoryFilmStorage filmStorage;
 
     @Override
     public Collection<Film> getAllFilms() {
