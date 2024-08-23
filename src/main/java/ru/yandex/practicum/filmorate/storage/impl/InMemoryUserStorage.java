@@ -36,8 +36,17 @@ public class InMemoryUserStorage implements UserStorage {
             return newUser;
         }
 
-        log.error("error - Фильм с id = '{}' не найден", newUser.getId());
+        log.error("error - Юзер с id = '{}' не найден", newUser.getId());
         throw new ValidationException("Юзер с id = " + newUser.getId() + " не найден");
+    }
+
+    public User getUserById(Long id) {
+        if (users.containsKey(id)) {
+            return users.get(id);
+        }
+
+        log.error("error - Юзер с id = '{}' не найден", id);
+        throw new ValidationException("Юзер с id = " + id);
     }
 
     private long getNextId() { // метод генерации id

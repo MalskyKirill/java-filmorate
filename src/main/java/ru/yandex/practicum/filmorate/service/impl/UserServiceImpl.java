@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -9,9 +11,13 @@ import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
+@Service
 public class UserServiceImpl implements UserService {
     private final InMemoryUserStorage userStorage;
 
@@ -36,6 +42,45 @@ public class UserServiceImpl implements UserService {
         validateUser(newUser);
         return userStorage.updateUser(newUser);
     }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) { // добавлеие в друзья
+        User user = userStorage.getUserById(userId); // получили юзера
+        User friend = userStorage.getUserById(friendId); // получили друга
+
+        user.addFriend(friendId); // добавляем друзей в список
+        friend.addFriend(userId);
+
+        log.info("Пользователи с id '{}' и '{}' подужились", userId, friendId);
+    }
+
+    @Override
+    public void deleteFriend(Long userId, Long friendId) { // удаление из друзей
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+
+        user.removeFriend(friendId);
+        friend.removeFriend(userId);
+
+        log.info("Пользователи с id '{}' и '{}' больше не друзья", userId, friendId);
+    }
+
+    @Override
+    public List<User> getFriendList(Long id) { // получение списка друзей
+        User user = userStorage.getUserById(id); // находим пользователя
+
+        Set<Long> friends = user.getFriends(); // получаем список id друзей
+
+        if (friends.isEmpty()) { // если список пуст
+            log.error("Пользователи с id '{}' совсем нет друзей", id); // логируем
+            throw new NotFoundException("Лист друзей пуст"); // и кидаем исключение
+        }
+
+        return friends.stream() // создаем стрим
+            .map(userId -> userStorage.getUserById(userId)) // для каждого id возвращаем друга
+            .collect(Collectors.toList()); // собираем друзей в список
+    }
+
 
     private void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
