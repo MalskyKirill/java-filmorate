@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -15,4 +16,13 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private Set<Long> friends;
+
+    public void addFriend(long id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(Long id) {
+        friends.remove(id);
+    }
 }
