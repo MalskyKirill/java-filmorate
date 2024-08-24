@@ -18,11 +18,11 @@ public class User {
     private LocalDate birthday;
     private Set<Long> friends;
 
-    public void addFriend(long id) {
-        friends.add(id);
+    public void addFriend(long userId) {
+        friends.add(userId);
     }
 
-    public void removeFriend(Long id) {
-        friends.remove(id);
+    public void removeFriend(Long userId) {
+        friends.remove(userId);
     }
 }

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 @SpringBootTest
 public class UserControllerTest {
@@ -23,7 +24,7 @@ public class UserControllerTest {
 
     @Test
     void createAndAddUser() {
-        User newUser = new User(1L, "javascript@yandex.ru", "JavaScript", "JS", LocalDate.of(1995, 12, 4));
+        User newUser = new User(1L, "javascript@yandex.ru", "JavaScript", "JS", LocalDate.of(1995, 12, 4), new HashSet<>());
 
         userController.createUser(newUser);
         Assertions.assertEquals(testUser, newUser);
@@ -31,7 +32,7 @@ public class UserControllerTest {
 
     @Test
     void createUpdateAndAddUser() {
-        User newUser = new User(1L, "javascript@yandex.ru", "React", "JS", LocalDate.of(1995, 12, 4));
+        User newUser = new User(1L, "javascript@yandex.ru", "React", "JS", LocalDate.of(1995, 12, 4), new HashSet<>());
 
         userController.createUser(testUser);
         userController.updateUser(newUser);
@@ -40,7 +41,7 @@ public class UserControllerTest {
 
     @Test
     void createUserWithEmptyLoginOrWithSpace() {
-        User newUser = new User(1L, "javascript@yandex.ru", "J S", "JS", LocalDate.of(1995, 12, 4));
+        User newUser = new User(1L, "javascript@yandex.ru", "J S", "JS", LocalDate.of(1995, 12, 4), new HashSet<>());
 
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(newUser));
         Assertions.assertEquals(0, userController.getUsers().size());
@@ -48,7 +49,7 @@ public class UserControllerTest {
 
     @Test
     void createUserWithFutureBirthday() {
-        User newUser = new User(1L, "javascript@yandex.ru", "JS", "JS", LocalDate.of(2995, 12, 4));
+        User newUser = new User(1L, "javascript@yandex.ru", "JS", "JS", LocalDate.of(2995, 12, 4), new HashSet<>());
 
         Assertions.assertThrows(ValidationException.class, () -> userController.createUser(newUser));
         Assertions.assertEquals(0, userController.getUsers().size());

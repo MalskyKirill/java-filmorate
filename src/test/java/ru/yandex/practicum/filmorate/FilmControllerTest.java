@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 @SpringBootTest
 public class FilmControllerTest {
@@ -23,7 +24,7 @@ public class FilmControllerTest {
 
     @Test
     void createAndAddFilm() {
-        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1995, 05, 23), 1000);
+        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1995, 05, 23), 1000, new HashSet<>());
 
         filmController.createFilm(newFilm);
         Assertions.assertEquals(testFilm, newFilm);
@@ -31,7 +32,7 @@ public class FilmControllerTest {
 
     @Test
     void createUpdateAndAddFilm() {
-        Film newFilm = new Film(1L, "JavaScript", "Spring boot", LocalDate.of(1985, 05, 23), 1000);
+        Film newFilm = new Film(1L, "JavaScript", "Spring boot", LocalDate.of(1985, 05, 23), 1000, new HashSet<>());
 
         filmController.createFilm(testFilm);
         filmController.updateFilm(newFilm);
@@ -40,7 +41,7 @@ public class FilmControllerTest {
 
     @Test
     void createFilmWithNegativeDuration() {
-        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1985, 05, 23), -15);
+        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1985, 05, 23), -15, new HashSet<>());
 
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(newFilm));
         Assertions.assertEquals(0, filmController.getAllFilms().size());
@@ -48,7 +49,7 @@ public class FilmControllerTest {
 
     @Test
     void createFilmWithDateReleaseBefore1895() {
-        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1885, 05, 23), 1000);
+        Film newFilm = new Film(1L, "Java", "Spring boot", LocalDate.of(1885, 05, 23), 1000, new HashSet<>());
 
         Assertions.assertThrows(ValidationException.class, () -> filmController.createFilm(newFilm));
         Assertions.assertEquals(0, filmController.getAllFilms().size());

@@ -81,6 +81,10 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList()); // собираем друзей в список
     }
 
+    private void validUserNotFound() {
+
+    }
+
 
     private void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
