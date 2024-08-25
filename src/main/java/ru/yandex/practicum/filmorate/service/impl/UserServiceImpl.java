@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -11,12 +13,13 @@ import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
     private final InMemoryUserStorage userStorage;
@@ -44,9 +47,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(Long id) {
+        return userStorage.getUserById(id);
+    }
+
+    @Override
     public void addFriend(Long userId, Long friendId) { // добавлеие в друзья
         User user = userStorage.getUserById(userId); // получили юзера
         User friend = userStorage.getUserById(friendId); // получили друга
+        System.out.println(user);
+        System.out.println(friend);
 
         user.addFriend(friendId); // добавляем друзей в список
         friend.addFriend(userId);
@@ -81,11 +91,6 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList()); // собираем друзей в список
     }
 
-    private void validUserNotFound() {
-
-    }
-
-
     private void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.error("электронная почта не может быть пустой и должна содержать символ @");
@@ -102,6 +107,9 @@ public class UserServiceImpl implements UserService {
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
             log.error("дата рождения не может быть в будущем");
             throw new ValidationException("дата рождения не может быть в будущем");
+        }
+        if (user.getFriends() == null) { // если создан новый пользователь без друзей
+            user.setFriends(new HashSet<>());
         }
     }
 

@@ -1,35 +1,62 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.impl.UserServiceImpl;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
+    @Autowired
+    private final UserServiceImpl userService;
 
     @GetMapping
     public Collection<User> getUsers() {
-        return null;
+        return userService.getUsers();
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-       return null;
-
+       return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User newUser) {
-        return null;
+        return userService.updateUser(newUser);
     }
+
+    @PutMapping("{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("{userId}/friends/{friendId}")
+    public void addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+        userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("{userId}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+        userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        return userService.getFriendList(id);
+    }
+
 
 }
