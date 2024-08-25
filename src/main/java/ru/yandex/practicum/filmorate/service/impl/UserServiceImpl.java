@@ -55,8 +55,6 @@ public class UserServiceImpl implements UserService {
     public void addFriend(Long userId, Long friendId) { // добавлеие в друзья
         User user = userStorage.getUserById(userId); // получили юзера
         User friend = userStorage.getUserById(friendId); // получили друга
-        System.out.println(user);
-        System.out.println(friend);
 
         user.addFriend(friendId); // добавляем друзей в список
         friend.addFriend(userId);
@@ -78,7 +76,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getFriendList(Long id) { // получение списка друзей
         User user = userStorage.getUserById(id); // находим пользователя
-
         Set<Long> friends = user.getFriends(); // получаем список id друзей
 
         if (friends.isEmpty()) { // если список пуст
@@ -89,6 +86,19 @@ public class UserServiceImpl implements UserService {
         return friends.stream() // создаем стрим
             .map(userId -> userStorage.getUserById(userId)) // для каждого id возвращаем друга
             .collect(Collectors.toList()); // собираем друзей в список
+    }
+
+    @Override
+    public List<User> getListOfCommonFriends(Long userId, Long otherId) { // получаем список друзей, общих с другим пользователем
+        Set<Long> userFriendsId = userStorage.getUserById(userId).getFriends(); // получаем списокк id друзей пользователя
+        Set<Long> otherUserFriendsId = userStorage.getUserById(otherId).getFriends(); //  и получаем список id друзей другого пользователя
+
+        log.info(" у пользователя '{}' и пользователя '{}' вернули список друзей", userId, otherId);
+
+        return userFriendsId.stream() // получаем стрим из id списка друзей
+            .filter(id -> otherUserFriendsId.contains(id)) // фильтруем id которые есть в списке другого пользователя
+            .map(id -> userStorage.getUserById(id)) // полученные id преобразовываем в обьект
+            .collect(Collectors.toList()); // собираем коллекцию общих друзей
     }
 
     private void validateUser(User user) {
@@ -109,6 +119,7 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("дата рождения не может быть в будущем");
         }
         if (user.getFriends() == null) { // если создан новый пользователь без друзей
+            log.info("юзеру установлен пустой список друзей");
             user.setFriends(new HashSet<>());
         }
     }
