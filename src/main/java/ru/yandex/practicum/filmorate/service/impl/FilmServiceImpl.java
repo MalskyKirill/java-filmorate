@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,12 +64,11 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> showTopTenMovies() {
+    public List<Film> showTopTenMovies(Integer lim) {
         log.info("сортировка фильмов по кол-ву лайков");
         return filmStorage.getAllFilms().stream()
-            .sorted(Comparator.comparing(film -> film.getLikes().size()))
-            .sorted(Collections.reverseOrder())
-            .limit(10)
+            .sorted(Comparator.comparing(Film::getLikeListSize).reversed())
+            .limit(lim)
             .collect(Collectors.toList());
     }
 
@@ -92,6 +88,10 @@ public class FilmServiceImpl implements FilmService {
         if (film.getDuration() == null || film.getDuration() <= 0) {
             log.error("error - продолжительность фильма должна быть положительным числом");
             throw new ValidationException("продолжительность фильма должна быть положительным числом");
+        }
+        if (film.getLikes() == null) { // если создан новый фильм без лайков
+            log.info("фильму установлен пустой список лайков");
+            film.setLikes(new HashSet<>());
         }
     }
 }

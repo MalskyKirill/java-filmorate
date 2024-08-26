@@ -28,4 +28,8 @@ public class Film {
     public void removeLike(Long userId) {
         likes.remove(userId);
     }
+
+    public int getLikeListSize() {
+        return likes.size();
+    }
 }
