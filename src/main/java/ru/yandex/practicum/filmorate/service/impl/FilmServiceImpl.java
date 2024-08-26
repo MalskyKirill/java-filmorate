@@ -38,7 +38,7 @@ public class FilmServiceImpl implements FilmService {
     public Film updateFilm(Film newFilm) {
         if (newFilm.getId() == null) { // проверка что фильм пришел с id
             log.error("error - Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
+            throw new NotFoundException("Id должен быть указан");
         }
 
         validationFilm(newFilm); // валидируем

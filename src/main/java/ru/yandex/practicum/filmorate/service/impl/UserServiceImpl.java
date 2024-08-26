@@ -12,10 +12,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -80,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
         if (friends.isEmpty()) { // если список пуст
             log.error("Пользователи с id '{}' совсем нет друзей", id); // логируем
-            throw new NotFoundException("Лист друзей пуст"); // и кидаем исключение
+            return new ArrayList<>(); //возвращаем пустой лист
         }
 
         return friends.stream() // создаем стрим

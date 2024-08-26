@@ -40,7 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
 
         log.error("error - Фильм с id = '{}' не найден", newFilm.getId());
-        throw new ValidationException("Фильм с id = " + newFilm.getId() + " не найден");
+        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
     }
 
     @Override

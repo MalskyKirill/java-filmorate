@@ -39,7 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         log.error("error - Юзер с id = '{}' не найден", newUser.getId());
-        throw new ValidationException("Юзер с id = " + newUser.getId() + " не найден");
+        throw new NotFoundException("Юзер с id = " + newUser.getId() + " не найден");
     }
 
     public User getUserById(Long id) {
