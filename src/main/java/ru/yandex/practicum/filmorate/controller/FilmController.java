@@ -42,9 +42,7 @@ public class FilmController {
     }
 
     @GetMapping("popular")
-    public List<Film> showTopTenMovies(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.showTopTenMovies(count);
+    public List<Film> showTopMovies(@RequestParam(defaultValue = "10") Integer count) {
+        return filmService.showTopMovies(count);
     }
-
-
 }

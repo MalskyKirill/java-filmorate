@@ -62,7 +62,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> showTopTenMovies(Integer lim) {
+    public List<Film> showTopMovies(Integer lim) {
         log.info("сортировка фильмов по кол-ву лайков");
         return filmStorage.getAllFilms().stream()
             .sorted(Comparator.comparing(Film::getLikeListSize).reversed())
