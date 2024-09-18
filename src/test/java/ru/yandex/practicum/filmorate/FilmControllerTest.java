@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.impl.FilmServiceImpl;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;

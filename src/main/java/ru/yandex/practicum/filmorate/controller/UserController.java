@@ -17,7 +17,7 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @GetMapping
-    public Collection<User> getUsers() {
+    public List<User> getUsers() {
         return userService.getUsers();
     }
 
