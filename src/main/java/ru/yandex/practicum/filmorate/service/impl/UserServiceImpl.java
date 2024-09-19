@@ -26,7 +26,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        return null;
+        validateUser(user);
+        return userDbStorage.createUser(user);
     }
 
     @Override
@@ -131,28 +132,28 @@ public class UserServiceImpl implements UserService {
 //            .collect(Collectors.toList()); // собираем коллекцию общих друзей
 //    }
 //
-//    private void validateUser(User user) {
-//        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-//            log.error("электронная почта не может быть пустой и должна содержать символ @");
-//            throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
-//        }
-//        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().matches(".*\\s.*")) {
-//            log.error("логин не может быть пустым и содержать пробелы");
-//            throw new ValidationException("логин не может быть пустым и содержать пробелы");
-//        }
-//        if (user.getName() == null || user.getName().isBlank()) {
-//            log.info("юзеру установлено имя", user.getLogin());
-//            user.setName(user.getLogin());
-//        }
-//        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-//            log.error("дата рождения не может быть в будущем");
-//            throw new ValidationException("дата рождения не может быть в будущем");
-//        }
-//        if (user.getFriends() == null) { // если создан новый пользователь без друзей
-//            log.info("юзеру установлен пустой список друзей");
-//            user.setFriends(new HashSet<>());
-//        }
-//    }
+    private void validateUser(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            log.error("электронная почта не может быть пустой и должна содержать символ @");
+            throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
+        }
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().matches(".*\\s.*")) {
+            log.error("логин не может быть пустым и содержать пробелы");
+            throw new ValidationException("логин не может быть пустым и содержать пробелы");
+        }
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.info("юзеру установлено имя", user.getLogin());
+            user.setName(user.getLogin());
+        }
+        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("дата рождения не может быть в будущем");
+            throw new ValidationException("дата рождения не может быть в будущем");
+        }
+        if (user.getFriends() == null) { // если создан новый пользователь без друзей
+            log.info("юзеру установлен пустой список друзей");
+            user.setFriends(new HashSet<>());
+        }
+    }
 
 
 }

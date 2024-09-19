@@ -15,6 +15,8 @@ public class UserDbStorageImpl implements UserDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
+    private static final String CREATE_QUERY = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
+
 
     @Override
     public List<User> getUsers() {
@@ -25,7 +27,10 @@ public class UserDbStorageImpl implements UserDbStorage {
 
     @Override
     public User createUser(User user) {
-        return null;
+        jdbcTemplate.update(CREATE_QUERY, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+
+        User newUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", new UserRowMapper(), user.getEmail());
+        return newUser;
     }
 
     @Override
