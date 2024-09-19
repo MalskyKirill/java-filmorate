@@ -3,10 +3,13 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.db.User.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.User.UserDbStorageImpl;
 import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryUserStorage;
 
 import java.time.LocalDate;
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserDbStorage userDbStorage;
+    private final UserDbStorageImpl userDbStorage;
 
     @Override
     public List<User> getUsers() {
@@ -31,12 +34,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User newUser) {
-        return null;
+    public User getUserById(Long id) {
+        if (userDbStorage.isUserContainedInBd(id)) {
+            return userDbStorage.getUserById(id);
+        }
+
+        throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, id));
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User updateUser(User newUser) {
         return null;
     }
 

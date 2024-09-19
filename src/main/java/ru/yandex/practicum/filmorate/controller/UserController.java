@@ -31,7 +31,7 @@ public class UserController {
         return userService.updateUser(newUser);
     }
 
-    @PutMapping("{id}")
+    @GetMapping("{id}")
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }

@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.storage.db.User;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public class UserDbStorageImpl implements UserDbStorage {
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String CREATE_QUERY = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-
+    private static final String FIND_USER_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
 
     @Override
     public List<User> getUsers() {
@@ -29,7 +31,8 @@ public class UserDbStorageImpl implements UserDbStorage {
     public User createUser(User user) {
         jdbcTemplate.update(CREATE_QUERY, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
 
-        User newUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", new UserRowMapper(), user.getEmail());
+        User newUser = jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", new UserRowMapper()
+            , user.getEmail());
         return newUser;
     }
 
@@ -40,6 +43,18 @@ public class UserDbStorageImpl implements UserDbStorage {
 
     @Override
     public User getUserById(Long id) {
-        return null;
+        User user = jdbcTemplate.queryForObject(FIND_USER_BY_ID_QUERY, new UserRowMapper(), id);
+        return user;
+    }
+
+    public boolean isUserContainedInBd(Long id) {
+        try {
+            getUserById(id);
+            log.trace("Юзер с id = '{}' найден", id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            log.error("error - Юзер с id = '{}' не найден", id);
+            return false;
+        }
     }
 }
