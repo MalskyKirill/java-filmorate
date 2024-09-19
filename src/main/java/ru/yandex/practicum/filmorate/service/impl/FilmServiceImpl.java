@@ -48,7 +48,7 @@ public class FilmServiceImpl implements FilmService {
         Film film = filmStorage.getFilmByID(filmId); // получили фильм
 
         userStorage.getUserById(userId); // проверили есть ли юзер
-        film.addLike(userId);
+//        film.addLike(userId);
         log.info("'юзер с id {}' лайкнул фильм '{}'", userId, filmId);
     }
 
@@ -57,7 +57,7 @@ public class FilmServiceImpl implements FilmService {
         Film film = filmStorage.getFilmByID(filmId); // получили фильм
 
         userStorage.getUserById(userId); // проверили есть ли юзер
-        film.removeLike(userId);
+//        film.removeLike(userId);
         log.info("'юзер с id {}' снял лайк с фильма '{}'", userId, filmId);
     }
 
@@ -65,7 +65,7 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> showTopMovies(Integer lim) {
         log.info("сортировка фильмов по кол-ву лайков");
         return filmStorage.getAllFilms().stream()
-            .sorted(Comparator.comparing(Film::getLikeListSize).reversed())
+//            .sorted(Comparator.comparing(Film::getLikeListSize).reversed())
             .limit(lim)
             .collect(Collectors.toList());
     }
