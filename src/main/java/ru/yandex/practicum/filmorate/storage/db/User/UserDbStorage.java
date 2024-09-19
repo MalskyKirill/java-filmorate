@@ -6,10 +6,7 @@ import java.util.List;
 
 public interface UserDbStorage {
     List<User> getUsers();
-
     User createUser(User user);
-
     User updateUser(User newUser);
-
     User getUserById(Long id);
 }

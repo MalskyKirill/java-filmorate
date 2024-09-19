@@ -44,7 +44,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(User newUser) {
-        return null;
+        if (userDbStorage.isUserContainedInBd(newUser.getId())) {
+            validateUser(newUser);
+            return userDbStorage.updateUser(newUser);
+        }
+
+        throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, newUser.getId()));
     }
 
     @Override
