@@ -15,22 +15,22 @@ import java.util.List;
 public class UserDbStorageImpl implements UserDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
-    private static final String CREATE_QUERY = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
+    private static final String FIND_ALL_USERS_QUERY = "SELECT * FROM users";
+    private static final String CREATE_USER_QUERY = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
     private static final String FIND_USER_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String FIND_USER_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
     private static final String UPDATE_USER_BY_ID_QUERY = "UPDATE users SET email = ? login = ? name = ? birthday = ? WHERE id = ?";
 
     @Override
     public List<User> getUsers() {
-        List<User> users = jdbcTemplate.query(FIND_ALL_QUERY, new UserRowMapper());
+        List<User> users = jdbcTemplate.query(FIND_ALL_USERS_QUERY, new UserRowMapper());
         log.trace("Получены все юзеры из БД");
         return users;
     }
 
     @Override
     public User createUser(User user) {
-        jdbcTemplate.update(CREATE_QUERY, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+        jdbcTemplate.update(CREATE_USER_QUERY, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
 
         User newUser = jdbcTemplate.queryForObject(FIND_USER_BY_EMAIL_QUERY, new UserRowMapper()
             , user.getEmail());

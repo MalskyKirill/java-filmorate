@@ -161,10 +161,6 @@ public class UserServiceImpl implements UserService {
             log.error("дата рождения не может быть в будущем");
             throw new ValidationException("дата рождения не может быть в будущем");
         }
-        if (user.getFriends() == null) { // если создан новый пользователь без друзей
-            log.info("юзеру установлен пустой список друзей");
-            user.setFriends(new HashSet<>());
-        }
     }
 
 
