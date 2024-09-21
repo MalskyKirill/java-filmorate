@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.impl.FilmServiceImpl;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +20,11 @@ public class FilmController {
     @GetMapping
     public Collection<Film> getAllFilms() { // метод получения всех фильмов
         return filmService.getAllFilms();
+    }
+
+    @GetMapping("{id}")
+    public Film getFilmById(@PathVariable Long id) { // метод получения всех фильмов
+        return filmService.getFilmById(id);
     }
 
     @PostMapping

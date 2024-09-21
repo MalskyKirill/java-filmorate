@@ -21,7 +21,9 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
     private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration) VALUES (?, ?, ?, ?)";
-    private static final String FIND_FILM_QUERY = "SELECT * FROM films WHERE description = ?";
+    private static final String FIND_FILM_QUERY_BY_NAME = "SELECT * FROM films WHERE name = ?";
+    private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
+
 
     @Override
     public List<Film> getAllFilms() {
@@ -33,13 +35,8 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     public Film createFilm(Film film) {
         jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
 
-        try {
-            Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_QUERY, new FilmRowMapper(), film.getDescription());
-            return newFilm;
-        }
-        catch (ServerErrorException e) {
-            throw new ServerErrorException("Фильм с таким описанием уже есть в базе данных");
-        }
+        Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_QUERY_BY_NAME, new FilmRowMapper(), film.getName());
+        return newFilm;
     }
 
     @Override
@@ -49,7 +46,20 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     @Override
     public Film getFilmByID(Long id) {
-        return null;
+        Film film = jdbcTemplate.queryForObject(FIND_FILM_BY_ID_QUERY, new FilmRowMapper(), id);
+        log.trace("Фильм {} получен из БД", id);
+        return film;
+    }
+
+    public boolean isFilmContainedInBd(Long id) {
+        try {
+            getFilmByID(id);
+            log.trace("Фильм с id = '{}' найден", id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            log.error("error - Фильм с id = '{}' не найден", id);
+            return false;
+        }
     }
 
     public boolean isFilmNameContainedInBd(Film film) {
