@@ -65,4 +65,15 @@ public class UserDbStorageImpl implements UserDbStorage {
             return false;
         }
     }
+
+    public boolean isUserEmailContainedInBd(User user) {
+        try {
+            jdbcTemplate.queryForObject("SELECT * FROM users WHERE email = ?", new UserRowMapper(), user.getEmail());
+            log.trace("Юзер с email = '{}' найден", user.getEmail());
+            return false;
+        } catch (EmptyResultDataAccessException e) {
+            log.error("error - Юзер с id = '{}' не найден", user.getEmail());
+            return true;
+        }
+    }
 }

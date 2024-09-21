@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.db.Film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.Film.FilmDbStorageImpl;
 import ru.yandex.practicum.filmorate.storage.db.User.UserDbStorageImpl;
 import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryUserStorage;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Service
 public class FilmServiceImpl implements FilmService {
-    private final FilmDbStorage filmStorage;
+    private final FilmDbStorageImpl filmStorage;
     private final UserDbStorageImpl userStorage;
 
     @Override
@@ -30,7 +32,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
-        return null;
+        if (filmStorage.isFilmNameContainedInBd(film)) {
+            validationFilm(film);
+            return filmStorage.createFilm(film);
+        }
+
+        throw new ServerErrorException("Фильм с таким названием уже существует");
     }
 
     @Override

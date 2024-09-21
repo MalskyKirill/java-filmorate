@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -29,8 +31,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        validateUser(user);
-        return userDbStorage.createUser(user);
+        if (userDbStorage.isUserEmailContainedInBd(user)) {
+            validateUser(user);
+            return userDbStorage.createUser(user);
+        }
+
+        throw new ServerErrorException("Пользователь с таким email уже существует");
     }
 
     @Override
