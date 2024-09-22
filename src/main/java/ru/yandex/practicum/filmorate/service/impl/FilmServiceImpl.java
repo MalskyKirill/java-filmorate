@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmServiceImpl implements FilmService {
     private final FilmDbStorageImpl filmStorage;
-    private final mpaServiceImpl mpaService;
+    private final MpaServiceImpl mpaService;
 
     @Override
     public Collection<Film> getAllFilms() {

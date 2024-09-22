@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db.RatingMpa;
+package ru.yandex.practicum.filmorate.storage.db.Mpa;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.Mpa;
