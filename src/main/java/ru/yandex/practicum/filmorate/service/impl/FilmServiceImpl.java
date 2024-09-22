@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmServiceImpl implements FilmService {
     private final FilmDbStorageImpl filmStorage;
-    private final UserDbStorageImpl userStorage;
+    private final mpaServiceImpl mpaService;
 
     @Override
     public Collection<Film> getAllFilms() {
@@ -34,7 +34,9 @@ public class FilmServiceImpl implements FilmService {
     public Film createFilm(Film film) {
         if (filmStorage.isFilmNameContainedInBd(film)) {
             validationFilm(film);
-            return filmStorage.createFilm(film);
+            Film newFilm = filmStorage.createFilm(film);
+            newFilm.setMpa(mpaService.getMpaById(newFilm.getMpa().getId()));
+            return newFilm;
         }
 
         throw new ServerErrorException("Фильм с таким названием уже существует");
@@ -42,7 +44,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film getFilmById(Long id) {
-        if (filmStorage.isFilmContainedInBd(id)) {
+        if (filmStorage.isFilmIdContainedInBd(id)) {
             return filmStorage.getFilmByID(id);
         }
 
@@ -51,7 +53,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        if (filmStorage.isFilmContainedInBd(newFilm.getId())) {
+        if (filmStorage.isFilmIdContainedInBd(newFilm.getId())) {
             validationFilm(newFilm);
             return filmStorage.updateFilm(newFilm);
         }

@@ -20,7 +20,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
     private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
-    private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration) VALUES (?, ?, ?, ?)";
+    private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
     private static final String FIND_FILM_BY_NAME_QUERY = "SELECT * FROM films WHERE name = ?";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
@@ -34,7 +34,8 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     @Override
     public Film createFilm(Film film) {
-        jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
+        jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate()
+            , film.getDuration(), film.getMpa().getId());
 
         Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_BY_NAME_QUERY, new FilmRowMapper(), film.getName());
         return newFilm;
@@ -55,7 +56,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
         return film;
     }
 
-    public boolean isFilmContainedInBd(Long id) {
+    public boolean isFilmIdContainedInBd(Long id) {
         try {
             getFilmByID(id);
             log.trace("Фильм с id = '{}' найден", id);
@@ -69,10 +70,10 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     public boolean isFilmNameContainedInBd(Film film) {
         try {
             jdbcTemplate.queryForObject("SELECT * FROM films WHERE name = ?", new FilmRowMapper(), film.getName());
-            log.trace("Фильм с email = '{}' найден", film.getName());
+            log.trace("Фильм с name = '{}' есть в базе", film.getName());
             return false;
         } catch (EmptyResultDataAccessException e) {
-            log.error("error - Фильм с id = '{}' не найден", film.getName());
+            log.error("error - Фильм с name = '{}' в базе отсутствует", film.getName());
             return true;
         }
     }
