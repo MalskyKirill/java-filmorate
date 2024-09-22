@@ -51,7 +51,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        return null;
+        if (filmStorage.isFilmContainedInBd(newFilm.getId())) {
+            validationFilm(newFilm);
+            return filmStorage.updateFilm(newFilm);
+        }
+
+        throw new NotFoundException(String.format(NotFoundException.FILM_NOT_FOUND, newFilm.getId()));
     }
 
     @Override

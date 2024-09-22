@@ -19,7 +19,7 @@ public class UserDbStorageImpl implements UserDbStorage {
     private static final String CREATE_USER_QUERY = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
     private static final String FIND_USER_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String FIND_USER_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
-    private static final String UPDATE_USER_BY_ID_QUERY = "UPDATE users SET email = ? login = ? name = ? birthday = ? WHERE id = ?";
+    private static final String UPDATE_USER_BY_ID_QUERY = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
 
     @Override
     public List<User> getUsers() {

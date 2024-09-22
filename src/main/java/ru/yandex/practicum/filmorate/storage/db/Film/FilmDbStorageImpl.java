@@ -21,8 +21,9 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
     private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration) VALUES (?, ?, ?, ?)";
-    private static final String FIND_FILM_QUERY_BY_NAME = "SELECT * FROM films WHERE name = ?";
+    private static final String FIND_FILM_BY_NAME_QUERY = "SELECT * FROM films WHERE name = ?";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
+    private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
 
 
     @Override
@@ -35,13 +36,16 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     public Film createFilm(Film film) {
         jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration());
 
-        Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_QUERY_BY_NAME, new FilmRowMapper(), film.getName());
+        Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_BY_NAME_QUERY, new FilmRowMapper(), film.getName());
         return newFilm;
     }
 
     @Override
     public Film updateFilm(Film newFilm) {
-        return null;
+        jdbcTemplate.update(UPDATE_FILM_BY_ID_QUERY, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getId());
+        Film film = getFilmByID(newFilm.getId());
+        log.trace("Фильм {} обновлен в БД", newFilm.getId());
+        return film;
     }
 
     @Override
