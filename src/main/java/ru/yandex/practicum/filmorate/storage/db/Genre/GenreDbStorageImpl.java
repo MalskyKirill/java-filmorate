@@ -15,5 +15,7 @@ public class GenreDbStorageImpl implements GenreDbStorage{
     public Genre getGenreById(Integer id) {
         Genre genre = jdbcTemplate.queryForObject(FIND_GENRE_BY_ID_QUERY, new GenreRowMapper(), id);
         return genre;
+
+
     }
 }

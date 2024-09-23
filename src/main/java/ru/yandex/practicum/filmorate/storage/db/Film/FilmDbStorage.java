@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.db.Film;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface FilmDbStorage  {
     List<Film> getAllFilms();
@@ -13,4 +15,8 @@ public interface FilmDbStorage  {
     Film updateFilm(Film newFilm);
 
     Film getFilmByID(Long id);
+
+    void addGenres(Long filmId, Set<Genre> genres);
+
+    Set<Genre> getGenres(Long id);
 }

@@ -36,6 +36,8 @@ public class FilmServiceImpl implements FilmService {
             validationFilm(film);
             Film newFilm = filmStorage.createFilm(film);
             newFilm.setMpa(mpaService.getMpaById(newFilm.getMpa().getId()));
+            filmStorage.addGenres(newFilm.getId(), film.getGenres());
+            newFilm.setGenres(filmStorage.getGenres(newFilm.getId()));
             return newFilm;
         }
 
