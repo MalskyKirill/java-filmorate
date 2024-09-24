@@ -32,16 +32,16 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
-        if (filmStorage.isFilmNameContainedInBd(film)) {
+//        if (filmStorage.isFilmNameContainedInBd(film)) {
             validationFilm(film);
             Film newFilm = filmStorage.createFilm(film);
             newFilm.setMpa(mpaService.getMpaById(newFilm.getMpa().getId()));
             filmStorage.addGenres(newFilm.getId(), film.getGenres());
             newFilm.setGenres(filmStorage.getGenres(newFilm.getId()));
             return newFilm;
-        }
-
-        throw new ServerErrorException("Фильм с таким названием уже существует");
+//        }
+//
+//        throw new ServerErrorException("Фильм с таким названием уже существует");
     }
 
     @Override
@@ -55,12 +55,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        if (filmStorage.isFilmIdContainedInBd(newFilm.getId())) {
             validationFilm(newFilm);
-            return filmStorage.updateFilm(newFilm);
-        }
-
-        throw new NotFoundException(String.format(NotFoundException.FILM_NOT_FOUND, newFilm.getId()));
+            Film film = filmStorage.updateFilm(newFilm);
+            film.setMpa(mpaService.getMpaById(film.getMpa().getId()));
+            filmStorage.updateGenres(film.getId(), newFilm.getGenres());
+            film.setGenres(filmStorage.getGenres(film.getId()));
+            return film;
     }
 
     @Override

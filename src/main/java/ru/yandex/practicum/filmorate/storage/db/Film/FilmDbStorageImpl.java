@@ -27,9 +27,10 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
     private static final String FIND_FILM_BY_NAME_QUERY = "SELECT * FROM films WHERE name = ?";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
-    private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
+    private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
     private static final String ADD_FILM_AND_GENRE_IN_FILM_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
     private static final String FIND_GENRES_QUERY = "SELECT f.genre_id, g.genre FROM film_genres AS f LEFT OUTER JOIN genres AS g ON f.genre_id = g.genre_id WHERE f.film_id = ?";
+    private static final String DELETE_GENRES_FROM_FILM_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
 
 
     @Override
@@ -49,7 +50,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        jdbcTemplate.update(UPDATE_FILM_BY_ID_QUERY, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getId());
+        jdbcTemplate.update(UPDATE_FILM_BY_ID_QUERY, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
         Film film = getFilmByID(newFilm.getId());
         log.trace("Фильм {} обновлен в БД", newFilm.getId());
         return film;
@@ -77,6 +78,19 @@ public class FilmDbStorageImpl implements FilmDbStorage {
         return genres;
     }
 
+    @Override
+    public void deleteGenres(Long id) {
+        jdbcTemplate.update(DELETE_GENRES_FROM_FILM_QUERY, id);
+        log.trace("Жанры у фильма id {} удалены", id);
+    }
+
+    @Override
+    public void updateGenres(Long filmId, Set<Genre> genres) {
+        deleteGenres(filmId);
+        System.out.println(genres);
+        addGenres(filmId, genres);
+    }
+
     public boolean isFilmIdContainedInBd(Long id) {
         try {
             getFilmByID(id);
@@ -88,14 +102,5 @@ public class FilmDbStorageImpl implements FilmDbStorage {
         }
     }
 
-    public boolean isFilmNameContainedInBd(Film film) {
-        try {
-            jdbcTemplate.queryForObject("SELECT * FROM films WHERE name = ?", new FilmRowMapper(), film.getName());
-            log.trace("Фильм с name = '{}' есть в базе", film.getName());
-            return false;
-        } catch (EmptyResultDataAccessException e) {
-            log.error("error - Фильм с name = '{}' в базе отсутствует", film.getName());
-            return true;
-        }
-    }
+
 }

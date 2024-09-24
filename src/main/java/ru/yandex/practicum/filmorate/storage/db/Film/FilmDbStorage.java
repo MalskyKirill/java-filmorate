@@ -19,4 +19,8 @@ public interface FilmDbStorage  {
     void addGenres(Long filmId, Set<Genre> genres);
 
     Set<Genre> getGenres(Long id);
+
+    void deleteGenres(Long id);
+
+    void updateGenres(Long filmId, Set<Genre> genres);
 }
