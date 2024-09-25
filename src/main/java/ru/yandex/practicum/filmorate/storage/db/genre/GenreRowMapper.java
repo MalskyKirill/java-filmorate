@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db.Genre;
+package ru.yandex.practicum.filmorate.storage.db.genre;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;

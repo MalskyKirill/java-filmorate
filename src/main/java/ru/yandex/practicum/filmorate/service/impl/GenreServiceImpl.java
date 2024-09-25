@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
-import ru.yandex.practicum.filmorate.storage.db.Genre.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.Genre.GenreDbStorageImpl;
+import ru.yandex.practicum.filmorate.storage.db.genre.GenreDbStorageImpl;
 
 @Service
 @RequiredArgsConstructor

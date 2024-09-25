@@ -1,17 +1,13 @@
-package ru.yandex.practicum.filmorate.storage.db.Film;
+package ru.yandex.practicum.filmorate.storage.db.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.db.Genre.GenreRowMapper;
-import ru.yandex.practicum.filmorate.storage.db.User.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.db.genre.GenreRowMapper;
 
 import java.util.HashSet;
 import java.util.List;

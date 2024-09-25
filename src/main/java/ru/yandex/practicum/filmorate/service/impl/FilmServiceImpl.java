@@ -3,20 +3,16 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.db.Film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.Film.FilmDbStorageImpl;
-import ru.yandex.practicum.filmorate.storage.db.User.UserDbStorageImpl;
-import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.local.imp.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.db.film.FilmDbStorageImpl;
+import ru.yandex.practicum.filmorate.storage.db.like.LikeDbStorageImpl;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -24,6 +20,7 @@ import java.util.stream.Collectors;
 public class FilmServiceImpl implements FilmService {
     private final FilmDbStorageImpl filmStorage;
     private final MpaServiceImpl mpaService;
+    private final LikeDbStorageImpl likeDbStorage;
 
     @Override
     public Collection<Film> getAllFilms() {
@@ -65,12 +62,22 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(Long filmId, Long userId) {
+        if (!likeDbStorage.isLikeContainsInBd(filmId, userId)) {
+            likeDbStorage.addLike(filmId, userId);
+            return;
+        }
 
+        throw new AlreadyExistsException("Не удалось добавить лайк");
     }
 
     @Override
     public void removeLike(Long filmId, Long userId) {
+        if (likeDbStorage.isLikeContainsInBd(filmId, userId)) {
+            likeDbStorage.removeLike(filmId, userId);
+            return;
+        }
 
+        throw new AlreadyExistsException("Не удалось удалить лайк");
     }
 
     @Override

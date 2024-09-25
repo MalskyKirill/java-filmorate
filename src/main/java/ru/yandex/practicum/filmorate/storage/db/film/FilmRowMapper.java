@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db.Film;
+package ru.yandex.practicum.filmorate.storage.db.film;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 public class FilmRowMapper implements RowMapper<Film> {
     @Override

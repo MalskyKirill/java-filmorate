@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db.Mpa;
+package ru.yandex.practicum.filmorate.storage.db.mpa;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
