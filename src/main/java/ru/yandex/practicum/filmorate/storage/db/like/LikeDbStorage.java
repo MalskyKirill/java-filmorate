@@ -6,4 +6,6 @@ public interface LikeDbStorage {
     void removeLike(Long filmId, Long userId);
 
     boolean isLikeContainsInBd(Long filmId, Long userId);
+
+    int countLikes(Long filmId);
 }

@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -16,6 +17,7 @@ public class LikeDbStorageImpl implements LikeDbStorage{
     private static final String ADD_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
     private static final String REMOVE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKE_QUERY = "SELECT * FROM likes WHERE film_id = ? AND user_id = ?";
+    private static final String FIND_LIKES_COUNT_QUERY = "SELECT COUNT(*) FROM likes WHERE film_id = ?";
 
     @Override
     public void addLike(Long filmId, Long userId) {
@@ -41,5 +43,10 @@ public class LikeDbStorageImpl implements LikeDbStorage{
         }
     }
 
-
+    @Override
+    public int countLikes(Long filmId) {
+        Integer count = Objects.requireNonNull(jdbcTemplate.queryForObject(FIND_LIKES_COUNT_QUERY, Integer.class, filmId));
+        log.trace("У фильма с id {} количество лайков {}", filmId, count);
+        return count;
+    }
 }

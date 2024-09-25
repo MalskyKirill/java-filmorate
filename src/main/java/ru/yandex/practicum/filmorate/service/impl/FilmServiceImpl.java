@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.db.like.LikeDbStorageImpl;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -82,7 +83,18 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> showTopMovies(Integer lim) {
-        return null;
+
+        List<Film> topFilms = getAllFilms()
+            .stream()
+            .sorted((f1, f2) -> likesCompare(f2, f1))
+            .limit(lim)
+            .collect(Collectors.toList());
+        log.trace("Получен топ фильмов {}.", topFilms);
+        return topFilms;
+    }
+
+    private int likesCompare(Film firstFilm, Film secondFilm) {
+        return Integer.compare(likeDbStorage.countLikes(firstFilm.getId()), likeDbStorage.countLikes(secondFilm.getId()));
     }
 
 //    @Override
