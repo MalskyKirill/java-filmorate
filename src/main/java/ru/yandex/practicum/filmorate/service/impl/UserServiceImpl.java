@@ -66,7 +66,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteFriend(Long userId, Long friendId) {
-
+        checkFriendToRemove(userId, friendId);
+        amiabilityDbStorage.deleteFriend(userId, friendId);
     }
 
     @Override
@@ -91,6 +92,21 @@ public class UserServiceImpl implements UserService {
         }
         if (amiabilityDbStorage.isAmiability(userID, friendID)) {
             throw new AlreadyExistsException(String.format(AlreadyExistsException.AMIABILITY_ALREADY_EXIST, userID, friendID));
+        }
+    }
+
+    private void checkFriendToRemove(long userID, long friendID) {
+        if (!userDbStorage.isUserContainedInBd(userID)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+        }
+        if (!userDbStorage.isUserContainedInBd(friendID)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+        }
+        if (userID == friendID) {
+            throw new ValidationException("Id пользователя и Id друга совподают");
+        }
+        if (!amiabilityDbStorage.isAmiability(userID, friendID)) {
+            throw new NotFoundException(String.format(NotFoundException.AMIABILITY_NOT_FOUND, userID, friendID));
         }
     }
 

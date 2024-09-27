@@ -15,19 +15,30 @@ public class AmiabilityDbStorageImpl implements AmiabilityDbStorage {
 
     private static final String CREATE_AMIABILITY_QUERY = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
     private static final String FIND_AMIABILITY_QUERY = "SELECT * FROM friends WHERE user_id = ? AND friend_id = ?";
+    private static final String ADD_AMIABILITY_STATUS_TRUE_QUERY = "UPDATE friends SET status = true WHERE user_id = ? AND friend_id = ?";
 
     @Override
     public void addFriend(Long userId, Long friendId, boolean status) {
         jdbcTemplate.update(CREATE_AMIABILITY_QUERY, userId, friendId, status);
         Amiability amiability = getAmiability(userId, friendId);
+
         if (amiability.getStatus()) {
-            jdbcTemplate.update("UPDATE friends SET status = true WHERE user_id = ? AND friend_id = ?", friendId, userId);
+            jdbcTemplate.update(ADD_AMIABILITY_STATUS_TRUE_QUERY, friendId, userId);
+            log.trace("Дружба между id {} и id {} ставла взаимной", userId, friendId);
         }
+
+        log.trace("Добавлена связь: {}", amiability);
     }
 
     @Override
     public void deleteFriend(Long userId, Long friendId) {
-
+        Amiability amiability = getAmiability(userId, friendId);
+        jdbcTemplate.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?", userId, friendId);
+        if (amiability.getStatus()) {
+            jdbcTemplate.update("UPDATE friends SET status = false WHERE user_id = ? AND friend_id = ?", friendId, userId);
+            log.trace("Дружба между id {} и id {} перестала быть взаимной", userId, friendId);
+        }
+        log.trace("Удалена связь: {}", amiability);
     }
 
     @Override
