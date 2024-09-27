@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.List;
 import java.util.Set;
 
-public interface FilmDbStorage  {
+public interface FilmDbStorage {
     List<Film> getAllFilms();
 
     Film createFilm(Film film);

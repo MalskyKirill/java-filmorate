@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.db.amiability.AmiabilityDbStorageImpl;
 import ru.yandex.practicum.filmorate.storage.db.user.UserDbStorageImpl;
 
 import java.time.LocalDate;
@@ -19,6 +21,7 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserDbStorageImpl userDbStorage;
+    private final AmiabilityDbStorageImpl amiabilityDbStorage;
 
     @Override
     public List<User> getUsers() {
@@ -56,7 +59,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend(Long userId, Long friendId) {
-
+        checkFriendToAdd(userId, friendId);
+        boolean isAmiability = amiabilityDbStorage.isAmiability(friendId, userId);
+        amiabilityDbStorage.addFriend(userId, friendId, isAmiability);
     }
 
     @Override
@@ -72,6 +77,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getListOfCommonFriends(Long userId, Long otherId) {
         return null;
+    }
+
+    private void checkFriendToAdd(long userID, long friendID) {
+        if (!userDbStorage.isUserContainedInBd(userID)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+        }
+        if (!userDbStorage.isUserContainedInBd(friendID)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+        }
+        if (userID == friendID) {
+            throw new ValidationException("Id пользователя и Id друга совподают");
+        }
+        if (amiabilityDbStorage.isAmiability(userID, friendID)) {
+            throw new AlreadyExistsException(String.format(AlreadyExistsException.AMIABILITY_ALREADY_EXIST, userID, friendID));
+        }
     }
 
 //    @Override

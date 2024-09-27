@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class Amiability {
     private Long userId;
     private Long friendId;
-    private boolean status;
+    private Boolean status;
 }
