@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
@@ -15,6 +16,8 @@ import ru.yandex.practicum.filmorate.storage.db.user.UserDbStorageImpl;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -71,42 +74,76 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getFriendList(Long id) {
-        return null;
+    public List<User> getFriendList(Long userId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
+        }
+
+        List<User> friends = amiabilityDbStorage.getFriendsId(userId)
+            .stream()
+            .map(id -> userDbStorage.getUserById(id))
+            .toList();
+
+        log.trace("Получен список друзей у id {}.", userId);
+        return friends;
     }
 
     @Override
-    public List<User> getListOfCommonFriends(Long userId, Long otherId) {
-        return null;
+    public List<User> getListOfCommonFriends(Long userId, Long friendId) {
+
+        checkCommonFriends(userId, friendId);
+
+        List<User> commonFriends = CollectionUtils.intersection(
+            amiabilityDbStorage.getFriendsId(userId),
+            amiabilityDbStorage.getFriendsId(friendId))
+            .stream()
+            .map(id -> userDbStorage.getUserById(id))
+            .toList();
+
+        log.trace("Получен список общих друзей у id {} и id {}", userId, friendId);
+
+        return commonFriends;
     }
 
-    private void checkFriendToAdd(long userID, long friendID) {
-        if (!userDbStorage.isUserContainedInBd(userID)) {
-            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+    private void checkFriendToAdd(long userId, long friendId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
         }
-        if (!userDbStorage.isUserContainedInBd(friendID)) {
-            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+        if (!userDbStorage.isUserContainedInBd(friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, friendId));
         }
-        if (userID == friendID) {
+        if (Objects.equals(userId, friendId)) {
             throw new ValidationException("Id пользователя и Id друга совподают");
         }
-        if (amiabilityDbStorage.isAmiability(userID, friendID)) {
-            throw new AlreadyExistsException(String.format(AlreadyExistsException.AMIABILITY_ALREADY_EXIST, userID, friendID));
+        if (amiabilityDbStorage.isAmiability(userId, friendId)) {
+            throw new AlreadyExistsException(String.format(AlreadyExistsException.AMIABILITY_ALREADY_EXIST, userId, friendId));
         }
     }
 
-    private void checkFriendToRemove(long userID, long friendID) {
-        if (!userDbStorage.isUserContainedInBd(userID)) {
-            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+    private void checkFriendToRemove(long userId, long friendId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
         }
-        if (!userDbStorage.isUserContainedInBd(friendID)) {
-            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userID));
+        if (!userDbStorage.isUserContainedInBd(friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, friendId));
         }
-        if (userID == friendID) {
+        if (Objects.equals(userId, friendId)) {
             throw new ValidationException("Id пользователя и Id друга совподают");
         }
-        if (!amiabilityDbStorage.isAmiability(userID, friendID)) {
-            throw new NotFoundException(String.format(NotFoundException.AMIABILITY_NOT_FOUND, userID, friendID));
+        if (!amiabilityDbStorage.isAmiability(userId, friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.AMIABILITY_NOT_FOUND, userId, friendId));
+        }
+    }
+
+    private void checkCommonFriends(Long userId, Long friendId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
+        }
+        if (!userDbStorage.isUserContainedInBd(friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, friendId));
+        }
+        if (Objects.equals(userId, friendId)) {
+            throw new ValidationException("Id пользователя и Id друга совподают");
         }
     }
 

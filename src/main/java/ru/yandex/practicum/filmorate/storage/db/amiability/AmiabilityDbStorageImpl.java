@@ -7,6 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Amiability;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -15,7 +18,10 @@ public class AmiabilityDbStorageImpl implements AmiabilityDbStorage {
 
     private static final String CREATE_AMIABILITY_QUERY = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
     private static final String FIND_AMIABILITY_QUERY = "SELECT * FROM friends WHERE user_id = ? AND friend_id = ?";
+    private static final String SELECT_USER_QUERY = "SELECT * FROM friends WHERE user_id = ?";
     private static final String ADD_AMIABILITY_STATUS_TRUE_QUERY = "UPDATE friends SET status = true WHERE user_id = ? AND friend_id = ?";
+    private static final String REMOVE_AMIABILITY_QUERY = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
+    private static final String ADD_AMIABILITY_STATUS_FALSE_QUERY = "UPDATE friends SET status = false WHERE user_id = ? AND friend_id = ?";
 
     @Override
     public void addFriend(Long userId, Long friendId, boolean status) {
@@ -33,12 +39,20 @@ public class AmiabilityDbStorageImpl implements AmiabilityDbStorage {
     @Override
     public void deleteFriend(Long userId, Long friendId) {
         Amiability amiability = getAmiability(userId, friendId);
-        jdbcTemplate.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?", userId, friendId);
+        jdbcTemplate.update(REMOVE_AMIABILITY_QUERY, userId, friendId);
         if (amiability.getStatus()) {
-            jdbcTemplate.update("UPDATE friends SET status = false WHERE user_id = ? AND friend_id = ?", friendId, userId);
+            jdbcTemplate.update(ADD_AMIABILITY_STATUS_FALSE_QUERY, friendId, userId);
             log.trace("Дружба между id {} и id {} перестала быть взаимной", userId, friendId);
         }
         log.trace("Удалена связь: {}", amiability);
+    }
+
+    @Override
+    public List<Long> getFriendsId(Long userId) {
+        List<Long> friendsId = jdbcTemplate.query(SELECT_USER_QUERY, new AmiabilityRowMapper(), userId)
+            .stream().map(Amiability::getFriendId).collect(Collectors.toList());
+        log.trace("Получены айдишники друзей {} у пользователя пользователея id {}", friendsId, userId);
+        return friendsId;
     }
 
     @Override
