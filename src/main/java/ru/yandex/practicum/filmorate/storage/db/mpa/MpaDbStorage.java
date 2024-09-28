@@ -4,4 +4,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 public interface MpaDbStorage {
     Mpa getRatingMpaById(Integer id);
+
+    boolean isMpaIdContainedInBd(Integer id);
 }

@@ -9,9 +9,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.db.genre.GenreRowMapper;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -25,7 +24,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
     private static final String ADD_FILM_AND_GENRE_IN_FILM_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-    private static final String FIND_GENRES_QUERY = "SELECT f.genre_id, g.genre FROM film_genres AS f LEFT OUTER JOIN genres AS g ON f.genre_id = g.genre_id WHERE f.film_id = ?";
+    private static final String FIND_GENRES_QUERY = "SELECT f.genre_id, g.genre FROM film_genres AS f LEFT OUTER JOIN genres AS g ON f.genre_id = g.genre_id WHERE f.film_id = ? ORDER BY f.genre_id";
     private static final String DELETE_GENRES_FROM_FILM_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
 
 

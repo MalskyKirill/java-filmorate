@@ -72,7 +72,7 @@ public class UserDbStorageImpl implements UserDbStorage {
             log.trace("Юзер с email = '{}' найден", user.getEmail());
             return false;
         } catch (EmptyResultDataAccessException e) {
-            log.error("error - Юзер с id = '{}' не найден", user.getEmail());
+            log.error("error - Юзер с email = '{}' не найден", user.getEmail());
             return true;
         }
     }
