@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.storage.db.film.FilmDbStorageImpl;
 import ru.yandex.practicum.filmorate.storage.db.like.LikeDbStorageImpl;
 
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.exceptions.ValidationException.GENRE_NOT_FOUND;
 import static ru.yandex.practicum.filmorate.exceptions.ValidationException.MPA_NOT_FOUND;
 
 @Slf4j
@@ -25,6 +27,7 @@ public class FilmServiceImpl implements FilmService {
     private final FilmDbStorageImpl filmStorage;
     private final MpaServiceImpl mpaService;
     private final LikeDbStorageImpl likeDbStorage;
+    private final GenreServiceImpl genreService;
 
     @Override
     public Collection<Film> getAllFilms() {
@@ -118,5 +121,11 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException(String.format(MPA_NOT_FOUND, film.getMpa().getId()));
         }
 
+        for (Genre genre : film.getGenres()) {
+            if (!genreService.isGenreIdContainedInBd(genre.getId())) {
+                log.error("error - жанр {} не найден", genre.getGenre());
+                throw new ValidationException(String.format(GENRE_NOT_FOUND, genre.getId()));
+            }
+        }
     }
 }

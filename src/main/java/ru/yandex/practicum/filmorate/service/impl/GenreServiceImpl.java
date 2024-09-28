@@ -14,4 +14,9 @@ public class GenreServiceImpl implements GenreService {
     public Genre getGenreById(Integer id) {
         return genreDbStorage.getGenreById(id);
     }
+
+    @Override
+    public boolean isGenreIdContainedInBd(Integer id) {
+        return genreDbStorage.isGenreIdContainedInBd(id);
+    }
 }
