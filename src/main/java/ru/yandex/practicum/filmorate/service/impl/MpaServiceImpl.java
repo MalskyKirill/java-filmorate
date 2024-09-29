@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.db.mpa.MpaDbStorageImpl;
 
 import java.util.List;
-
 import static ru.yandex.practicum.filmorate.exceptions.ValidationException.MPA_NOT_FOUND;
 
 @Service
