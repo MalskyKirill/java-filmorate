@@ -32,16 +32,14 @@ public class UserDbStorageImpl implements UserDbStorage {
     public User createUser(User user) {
         jdbcTemplate.update(CREATE_USER_QUERY, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
 
-        User newUser = jdbcTemplate.queryForObject(FIND_USER_BY_EMAIL_QUERY, new UserRowMapper()
-            , user.getEmail());
+        User newUser = jdbcTemplate.queryForObject(FIND_USER_BY_EMAIL_QUERY, new UserRowMapper(), user.getEmail());
         log.trace("Юзер {} создан в БД", newUser.getId());
         return newUser;
     }
 
     @Override
     public User updateUser(User newUser) {
-        jdbcTemplate.update(UPDATE_USER_BY_ID_QUERY, newUser.getEmail(), newUser.getLogin()
-            , newUser.getName(), newUser.getBirthday(), newUser.getId());
+        jdbcTemplate.update(UPDATE_USER_BY_ID_QUERY, newUser.getEmail(), newUser.getLogin(), newUser.getName(), newUser.getBirthday(), newUser.getId());
 
         User user = getUserById(newUser.getId());
         log.trace("Юзер {} обновлен в БД", newUser.getId());
