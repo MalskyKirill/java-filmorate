@@ -38,8 +38,9 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     public Film createFilm(Film film) {
         jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate()
             , film.getDuration(), film.getMpa().getId());
-
+        
         Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_BY_NAME_QUERY, new FilmRowMapper(), film.getName());
+        log.trace("Фильм {} создан в БД", newFilm.getId());
         return newFilm;
     }
 

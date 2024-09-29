@@ -17,7 +17,7 @@ public class MpaServiceImpl implements MpaService {
     private final MpaDbStorageImpl mpaDbStorage;
     @Override
     public Mpa getMpaById(Integer id) {
-        if (mpaDbStorage.isMpaIdContainedInBd(id)) {
+        if (isMpaIdContainedInBd(id)) {
             return mpaDbStorage.getRatingMpaById(id);
         }
 

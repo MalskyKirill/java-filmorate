@@ -47,7 +47,10 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film getFilmById(Long id) {
         if (filmStorage.isFilmIdContainedInBd(id)) {
-            return filmStorage.getFilmByID(id);
+            Film newFilm = filmStorage.getFilmByID(id);
+            newFilm.setMpa(mpaService.getMpaById(newFilm.getMpa().getId()));
+            newFilm.setGenres(filmStorage.getGenres(newFilm.getId()));
+            return newFilm;
         }
 
         throw new NotFoundException(String.format(NotFoundException.FILM_NOT_FOUND, id));
@@ -123,7 +126,7 @@ public class FilmServiceImpl implements FilmService {
 
         for (Genre genre : film.getGenres()) {
             if (!genreService.isGenreIdContainedInBd(genre.getId())) {
-                log.error("error - жанр {} не найден", genre.getGenre());
+                log.error("error - жанр {} не найден", genre.getName());
                 throw new ValidationException(String.format(GENRE_NOT_FOUND, genre.getId()));
             }
         }

@@ -7,12 +7,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.util.List;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class GenreDbStorageImpl implements GenreDbStorage{
     private final JdbcTemplate jdbcTemplate;
     private static final String FIND_GENRE_BY_ID_QUERY = "SELECT * FROM genres WHERE genre_id = ?";
+    private static final String SELECT_ALL_GENRES_QUERY = "SELECT * FROM genres";
 
     @Override
     public Genre getGenreById(Integer id) {
@@ -30,5 +33,10 @@ public class GenreDbStorageImpl implements GenreDbStorage{
             log.trace("жанр id {} не найден", id);
             return false;
         }
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return jdbcTemplate.query(SELECT_ALL_GENRES_QUERY, new GenreRowMapper());
     }
 }
