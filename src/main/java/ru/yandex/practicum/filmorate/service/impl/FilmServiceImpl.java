@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.storage.db.film.FilmDbStorageImpl;
 import ru.yandex.practicum.filmorate.storage.db.like.LikeDbStorageImpl;
 
@@ -119,7 +118,7 @@ public class FilmServiceImpl implements FilmService {
             log.error("error - продолжительность фильма должна быть положительным числом");
             throw new ValidationException("продолжительность фильма должна быть положительным числом");
         }
-        if(!mpaService.isMpaIdContainedInBd(film.getMpa().getId())) {
+        if (!mpaService.isMpaIdContainedInBd(film.getMpa().getId())) {
             log.error("error - мпа не найдено");
             throw new ValidationException(String.format(MPA_NOT_FOUND, film.getMpa().getId()));
         }

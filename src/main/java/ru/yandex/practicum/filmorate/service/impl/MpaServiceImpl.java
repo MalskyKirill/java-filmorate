@@ -15,6 +15,7 @@ import static ru.yandex.practicum.filmorate.exceptions.ValidationException.MPA_N
 @RequiredArgsConstructor
 public class MpaServiceImpl implements MpaService {
     private final MpaDbStorageImpl mpaDbStorage;
+
     @Override
     public Mpa getMpaById(Integer id) {
         if (isMpaIdContainedInBd(id)) {

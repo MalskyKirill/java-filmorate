@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class MpaRowMapper implements RowMapper<Mpa> {
 
     @Override

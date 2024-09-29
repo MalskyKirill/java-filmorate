@@ -16,8 +16,6 @@ import ru.yandex.practicum.filmorate.storage.db.user.UserDbStorageImpl;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -94,8 +92,8 @@ public class UserServiceImpl implements UserService {
         checkCommonFriends(userId, friendId);
 
         List<User> commonFriends = CollectionUtils.intersection(
-            amiabilityDbStorage.getFriendsId(userId),
-            amiabilityDbStorage.getFriendsId(friendId))
+                amiabilityDbStorage.getFriendsId(userId),
+                amiabilityDbStorage.getFriendsId(friendId))
             .stream()
             .map(id -> userDbStorage.getUserById(id))
             .toList();

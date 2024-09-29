@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class GenreDbStorageImpl implements GenreDbStorage{
+public class GenreDbStorageImpl implements GenreDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private static final String FIND_GENRE_BY_ID_QUERY = "SELECT * FROM genres WHERE genre_id = ?";
     private static final String SELECT_ALL_GENRES_QUERY = "SELECT * FROM genres";

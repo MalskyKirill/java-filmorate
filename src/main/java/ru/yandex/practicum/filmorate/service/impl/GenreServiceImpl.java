@@ -15,6 +15,7 @@ import static ru.yandex.practicum.filmorate.exceptions.ValidationException.GENRE
 @RequiredArgsConstructor
 public class GenreServiceImpl implements GenreService {
     private final GenreDbStorageImpl genreDbStorage;
+
     @Override
     public Genre getGenreById(Integer id) {
         if (isGenreIdContainedInBd(id)) {

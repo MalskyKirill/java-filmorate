@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.db.genre.GenreRowMapper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -61,7 +60,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     @Override
     public void addGenres(Long filmId, Set<Genre> genres) {
-        for(Genre genre : genres){
+        for (Genre genre : genres) {
             jdbcTemplate.update(ADD_FILM_AND_GENRE_IN_FILM_GENRES_QUERY, filmId, genre.getId());
             log.trace("Фильму id {} добавлен жанр id {}.", filmId, genre.getId());
         }

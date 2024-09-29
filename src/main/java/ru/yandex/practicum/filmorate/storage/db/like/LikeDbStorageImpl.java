@@ -6,13 +6,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
 import java.util.Objects;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class LikeDbStorageImpl implements LikeDbStorage{
+public class LikeDbStorageImpl implements LikeDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private static final String ADD_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
     private static final String REMOVE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
