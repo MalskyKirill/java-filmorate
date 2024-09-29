@@ -7,7 +7,8 @@ import java.util.List;
 public interface MpaService {
     Mpa getMpaById(Integer id);
 
-    List<Mpa> getAllMpa();
-    
     boolean isMpaIdContainedInBd(Integer id);
+
+    List<Mpa> getAllMpa();
+
 }
