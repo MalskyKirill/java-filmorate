@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -13,23 +15,13 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Film {
     private Long id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
-    private Set<Long> likes;
-
-    public void addLike(Long userId) {
-        likes.add(userId);
-    }
-
-    public void removeLike(Long userId) {
-        likes.remove(userId);
-    }
-
-    public int getLikeListSize() {
-        return likes.size();
-    }
+    private Mpa mpa;
+    private Set<Genre> genres = new LinkedHashSet<>();
 }

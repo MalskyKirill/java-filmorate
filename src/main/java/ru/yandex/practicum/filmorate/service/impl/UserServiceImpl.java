@@ -2,97 +2,144 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.db.amiability.AmiabilityDbStorageImpl;
+import ru.yandex.practicum.filmorate.storage.db.user.UserDbStorageImpl;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    private final InMemoryUserStorage userStorage;
+    private final UserDbStorageImpl userDbStorage;
+    private final AmiabilityDbStorageImpl amiabilityDbStorage;
 
     @Override
-    public Collection<User> getUsers() {
-        return userStorage.getUsers();
+    public List<User> getUsers() {
+        return userDbStorage.getUsers();
     }
 
     @Override
     public User createUser(User user) {
-        validateUser(user);
-        return userStorage.createUser(user);
-    }
-
-    @Override
-    public User updateUser(User newUser) {
-        if (newUser.getId() == null) {
-            log.error("error - Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
+        if (userDbStorage.isUserEmailContainedInBd(user)) {
+            validateUser(user);
+            return userDbStorage.createUser(user);
         }
 
-        validateUser(newUser);
-        return userStorage.updateUser(newUser);
+        throw new ServerErrorException("Пользователь с таким email уже существует");
     }
 
     @Override
     public User getUserById(Long id) {
-        return userStorage.getUserById(id);
-    }
-
-    @Override
-    public void addFriend(Long userId, Long friendId) { // добавлеие в друзья
-        User user = userStorage.getUserById(userId); // получили юзера
-        User friend = userStorage.getUserById(friendId); // получили друга
-
-        user.addFriend(friendId); // добавляем друзей в список
-        friend.addFriend(userId);
-
-        log.info("Пользователи с id '{}' и '{}' подужились", userId, friendId);
-    }
-
-    @Override
-    public void deleteFriend(Long userId, Long friendId) { // удаление из друзей
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-
-        user.removeFriend(friendId);
-        friend.removeFriend(userId);
-
-        log.info("Пользователи с id '{}' и '{}' больше не друзья", userId, friendId);
-    }
-
-    @Override
-    public List<User> getFriendList(Long id) { // получение списка друзей
-        User user = userStorage.getUserById(id); // находим пользователя
-        Set<Long> friends = user.getFriends(); // получаем список id друзей
-
-        if (friends.isEmpty()) { // если список пуст
-            log.error("Пользователи с id '{}' совсем нет друзей", id); // логируем
-            return new ArrayList<>(); //возвращаем пустой лист
+        if (userDbStorage.isUserContainedInBd(id)) {
+            return userDbStorage.getUserById(id);
         }
 
-        return friends.stream() // создаем стрим
-            .map(userId -> userStorage.getUserById(userId)) // для каждого id возвращаем друга
-            .collect(Collectors.toList()); // собираем друзей в список
+        throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, id));
     }
 
     @Override
-    public List<User> getListOfCommonFriends(Long userId, Long otherId) { // получаем список друзей, общих с другим пользователем
-        Set<Long> userFriendsId = userStorage.getUserById(userId).getFriends(); // получаем списокк id друзей пользователя
-        Set<Long> otherUserFriendsId = userStorage.getUserById(otherId).getFriends(); //  и получаем список id друзей другого пользователя
+    public User updateUser(User newUser) {
+        if (userDbStorage.isUserContainedInBd(newUser.getId())) {
+            validateUser(newUser);
+            return userDbStorage.updateUser(newUser);
+        }
 
-        log.info(" у пользователя '{}' и пользователя '{}' вернули список друзей", userId, otherId);
+        throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, newUser.getId()));
+    }
 
-        return userFriendsId.stream() // получаем стрим из id списка друзей
-            .filter(id -> otherUserFriendsId.contains(id)) // фильтруем id которые есть в списке другого пользователя
-            .map(id -> userStorage.getUserById(id)) // полученные id преобразовываем в обьект
-            .collect(Collectors.toList()); // собираем коллекцию общих друзей
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        checkFriendToAdd(userId, friendId);
+        boolean isAmiability = amiabilityDbStorage.isAmiability(friendId, userId);
+        amiabilityDbStorage.addFriend(userId, friendId, isAmiability);
+    }
+
+    @Override
+    public void deleteFriend(Long userId, Long friendId) {
+        checkFriendToRemove(userId, friendId);
+        amiabilityDbStorage.deleteFriend(userId, friendId);
+    }
+
+    @Override
+    public List<User> getFriendList(Long userId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
+        }
+
+        List<User> friends = amiabilityDbStorage.getFriendsId(userId)
+            .stream()
+            .map(id -> userDbStorage.getUserById(id))
+            .toList();
+
+        log.trace("Получен список друзей у id {}.", userId);
+        return friends;
+    }
+
+    @Override
+    public List<User> getListOfCommonFriends(Long userId, Long friendId) {
+
+        checkCommonFriends(userId, friendId);
+
+        List<User> commonFriends = CollectionUtils.intersection(
+                amiabilityDbStorage.getFriendsId(userId),
+                amiabilityDbStorage.getFriendsId(friendId))
+            .stream()
+            .map(id -> userDbStorage.getUserById(id))
+            .toList();
+
+        log.trace("Получен список общих друзей у id {} и id {}", userId, friendId);
+
+        return commonFriends;
+    }
+
+    private void checkFriendToAdd(long userId, long friendId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
+        }
+        if (!userDbStorage.isUserContainedInBd(friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, friendId));
+        }
+        if (Objects.equals(userId, friendId)) {
+            throw new ValidationException("Id пользователя и Id друга совподают");
+        }
+        if (amiabilityDbStorage.isAmiability(userId, friendId)) {
+            throw new AlreadyExistsException(String.format(AlreadyExistsException.AMIABILITY_ALREADY_EXIST, userId, friendId));
+        }
+    }
+
+    private void checkFriendToRemove(long userId, long friendId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
+        }
+        if (!userDbStorage.isUserContainedInBd(friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, friendId));
+        }
+        if (Objects.equals(userId, friendId)) {
+            throw new ValidationException("Id пользователя и Id друга совподают");
+        }
+        if (!amiabilityDbStorage.isAmiability(userId, friendId)) {
+            throw new NotFoundAmiabilityException(String.format(NotFoundAmiabilityException.AMIABILITY_NOT_FOUND, userId, friendId));
+        }
+    }
+
+    private void checkCommonFriends(Long userId, Long friendId) {
+        if (!userDbStorage.isUserContainedInBd(userId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, userId));
+        }
+        if (!userDbStorage.isUserContainedInBd(friendId)) {
+            throw new NotFoundException(String.format(NotFoundException.USER_NOT_FOUND, friendId));
+        }
+        if (Objects.equals(userId, friendId)) {
+            throw new ValidationException("Id пользователя и Id друга совподают");
+        }
     }
 
     private void validateUser(User user) {
@@ -111,10 +158,6 @@ public class UserServiceImpl implements UserService {
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
             log.error("дата рождения не может быть в будущем");
             throw new ValidationException("дата рождения не может быть в будущем");
-        }
-        if (user.getFriends() == null) { // если создан новый пользователь без друзей
-            log.info("юзеру установлен пустой список друзей");
-            user.setFriends(new HashSet<>());
         }
     }
 
