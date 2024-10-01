@@ -19,7 +19,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
     private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
-    private static final String FIND_FILM_BY_NAME_QUERY = "SELECT * FROM films WHERE name = ?";
+    private static final String FIND_FILM_BY_NAME_QUERY = "SELECT * FROM films WHERE name = ? AND description = ? AND release_date = ? AND duration = ? AND mpa_id = ?";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
     private static final String ADD_FILM_AND_GENRE_IN_FILM_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
@@ -37,7 +37,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
     public Film createFilm(Film film) {
         jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
 
-        Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_BY_NAME_QUERY, new FilmRowMapper(), film.getName());
+        Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_BY_NAME_QUERY, new FilmRowMapper(), film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
         log.trace("Фильм {} создан в БД", newFilm.getId());
         return newFilm;
     }
@@ -67,7 +67,7 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     @Override
     public Set<Genre> getGenres(Long id) {
-        Set<Genre> genres = new HashSet<>(jdbcTemplate.query(FIND_GENRES_QUERY, new GenreRowMapper(), id));
+        Set<Genre> genres = new LinkedHashSet<>(jdbcTemplate.query(FIND_GENRES_QUERY, new GenreRowMapper(), id));
         log.trace("Найдены жанры для фильма id {}", id);
         return genres;
     }

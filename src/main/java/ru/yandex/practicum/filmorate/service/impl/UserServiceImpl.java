@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.filmorate.exceptions.AlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.db.amiability.AmiabilityDbStorageImpl;
@@ -129,7 +126,7 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Id пользователя и Id друга совподают");
         }
         if (!amiabilityDbStorage.isAmiability(userId, friendId)) {
-            throw new NotFoundException(String.format(NotFoundException.AMIABILITY_NOT_FOUND, userId, friendId));
+            throw new NotFoundAmiabilityException(String.format(NotFoundAmiabilityException.AMIABILITY_NOT_FOUND, userId, friendId));
         }
     }
 
