@@ -4,11 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.ServerErrorException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.db.genre.GenreRowMapper;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.*;
 
 @Slf4j
@@ -19,7 +23,6 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
     private static final String CREATE_FILM_QUERY = "INSERT INTO films (name, description, release_date , duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
-    private static final String FIND_FILM_BY_NAME_QUERY = "SELECT * FROM films WHERE name = ? AND description = ? AND release_date = ? AND duration = ? AND mpa_id = ?";
     private static final String FIND_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String UPDATE_FILM_BY_ID_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
     private static final String ADD_FILM_AND_GENRE_IN_FILM_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
@@ -35,11 +38,10 @@ public class FilmDbStorageImpl implements FilmDbStorage {
 
     @Override
     public Film createFilm(Film film) {
-        jdbcTemplate.update(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
-
-        Film newFilm = jdbcTemplate.queryForObject(FIND_FILM_BY_NAME_QUERY, new FilmRowMapper(), film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
-        log.trace("Фильм {} создан в БД", newFilm.getId());
-        return newFilm;
+        long id = insert(CREATE_FILM_QUERY, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId());
+        film.setId(id);
+        log.trace("Фильм {} создан в БД", film.getId());
+        return film;
     }
 
     @Override
@@ -96,5 +98,21 @@ public class FilmDbStorageImpl implements FilmDbStorage {
         }
     }
 
+    private long insert(String query, Object... params) {
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+            return ps;
+        }, keyHolder);
 
+        Long id = keyHolder.getKeyAs(Long.class);
+        if (id != null) {
+            return id;
+        } else {
+            throw new ServerErrorException("Не удалось сохранить данные");
+        }
+    }
 }
