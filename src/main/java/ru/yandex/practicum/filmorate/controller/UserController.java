@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.impl.UserServiceImpl;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -17,7 +16,7 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @GetMapping
-    public Collection<User> getUsers() {
+    public List<User> getUsers() {
         return userService.getUsers();
     }
 
@@ -31,7 +30,7 @@ public class UserController {
         return userService.updateUser(newUser);
     }
 
-    @PutMapping("{id}")
+    @GetMapping("{id}")
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
